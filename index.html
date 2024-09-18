@@ -142,7 +142,7 @@
         </div>
     </div>
 
-        <!-- 关于我的模态窗口 -->
+    <!-- 关于我的模态窗口 -->
     <div id="aboutModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -151,12 +151,23 @@
         </div>
     </div>
 
+    <!-- 论文的模态窗口 -->
+    <div id="publicationsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <!-- iframe 加载 publications.html -->
+            <iframe src="publications.html" title="关于我"></iframe>
+        </div>
+    </div>
+
     <script>
         // 获取模态窗口和相关元素
         var contactModal = document.getElementById("contactModal");
         var aboutModal = document.getElementById("aboutModal");
+        var pbulicationsModal = document.getElementById("publicationsModal");
         var contactBtn = document.getElementById("contact-btn");
         var aboutBtn = document.getElementById("about-btn");
+        var publicationsBtn = document.getElementById("publications-btn");
         var closeButtons = document.getElementsByClassName("close");
 
         // 当用户点击按钮时，打开模态窗口
@@ -168,7 +179,10 @@
         aboutBtn.onclick = function() {
             aboutModal.style.display = "flex";
         }
-
+        // 当用户点击 "论文" 按钮时，打开关于我的模态窗口
+        publicationsBtn.onclick = function() {
+            aboutModal.style.display = "flex";
+        }
 
         // 当用户点击关闭按钮时，关闭模态窗口
         for (var i = 0; i < closeButtons.length; i++) {
