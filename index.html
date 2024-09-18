@@ -31,6 +31,55 @@
             color: black;
         }
 
+        /* 模态窗口的背景（默认隐藏） */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 模态窗口内容样式 */
+        .modal-content {
+            background-color: #fff;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        /* iframe 样式 */
+        iframe {
+            width: 100%;
+            height: 400px; /* 设置窗口大小，可以根据需要调整 */
+            border: none;
+        }
+
+        /* 模态窗口关闭按钮样式 */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
         /* 主要内容部分 */
         section {
             padding: 20px;
@@ -84,7 +133,40 @@
         <p>我们现在是一个小团队，将来大概率也会是。无论你擅长统计、数学、编程，还是热爱野外工作、实验，只要愿意努力和学习，且有一颗好奇心，我相信你都能在这个小团队中有所成长。欢迎联系我们，一起寻找有趣的课题，探索我们所在的这个复杂而迷人的世界。对于博士或博士后，希望你能结合自己的技能与特长，融入我们组的研究。</p>
     </section>
 
+    <!-- 模态窗口 -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <!-- iframe 加载 contact.html -->
+            <iframe src="contact.html" title="联系信息"></iframe>
+        </div>
+    </div>
 
+    <script>
+        // 获取模态窗口和相关元素
+        var modal = document.getElementById("contactModal");
+        var btn = document.getElementById("contact-btn");
+        var span = document.getElementsByClassName("close")[0];
+
+        // 当用户点击按钮时，打开模态窗口
+        btn.onclick = function() {
+            modal.style.display = "flex";
+        }
+
+        // 当用户点击关闭按钮时，关闭模态窗口
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // 当用户点击模态窗口外的区域时，关闭模态窗口并返回主页
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                window.location.href = "index.html"; // 返回主页
+            }
+        }
+    </script>
+    
     <!-- 页脚 -->
     <footer>
         <p>&copy; 2024 我的个人网站 | GitHub: <a href="https://luotianbao.github.io/luotb.github.io" style="color: #f2f2f2;">https://luotianbao.github.io/luotb.github.io</a></p>
