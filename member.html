@@ -6,8 +6,8 @@
     <title>Members Heatmap</title>
     <style>
         #map {
-            width: 90vw;  /* 设置地图宽度为视口宽度 */
-            height: 90vh; /* 设置地图高度为视口高度 */
+            width: 90vw;
+            height: 90vh;
         }
         #info {
             margin-top: 20px;
@@ -19,7 +19,6 @@
             margin: 0 0 10px 0;
         }
     </style>
-    <!-- 引入ECharts库 -->
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
 </head>
 <body>
@@ -31,97 +30,90 @@
     </div>
 
     <script>
-        // 初始化echarts实例
         var mapChart = echarts.init(document.getElementById('map'));
-
-        // 存储从JSON文件读取的成员数据
         var memberData = [];
         var provinceMemberCount = {};
 
-        // 加载本地的中国地图GeoJSON文件
-        fetch('map.json') // 本地文件路径
-            .then(response => response.json())
-            .then(geoJson => {
-                // 注册中国地图
-                echarts.registerMap('china', geoJson);
+        Promise.all([
+            fetch('map.json').then(response => response.json()),
+            fetch('member.json').then(response => response.json())
+        ]).then(([geoJson, data]) => {
+            console.log('Loaded GeoJSON data:', geoJson);
+            echarts.registerMap('china', geoJson);
+            console.log('China map registered successfully');
 
-                // 从JSON文件中加载成员数据
-                return fetch('member.json');
-            })
-            .then(response => response.json())
-            .then(data => {
-                memberData = data;
+            memberData = data;
+            console.log('Loaded member data:', memberData);
 
-                // 统计每个省份的成员数量
-                data.forEach(member => {
-                    if (provinceMemberCount[member.province]) {
-                        provinceMemberCount[member.province]++;
-                    } else {
-                        provinceMemberCount[member.province] = 1;
+            data.forEach(member => {
+                if (provinceMemberCount[member.province]) {
+                    provinceMemberCount[member.province]++;
+                } else {
+                    provinceMemberCount[member.province] = 1;
+                }
+            });
+            console.log('Province member count:', provinceMemberCount);
+
+            var option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function (params) {
+                        var province = params.name;
+                        var count = provinceMemberCount[province] || 0;
+                        return province + ': ' + count + ' 名成员';
                     }
-                });
-
-                // 生成地图配置
-                var option = {
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: function (params) {
-                            var province = params.name;
-                            var count = provinceMemberCount[province] || 0;
-                            return province + ': ' + count + ' 名成员';
-                        }
-                    },
-                    visualMap: {
-                        min: 0,
-                        max: 10,
-                        left: 'left',
-                        top: 'bottom',
-                        text: ['多', '少'],
-                        calculable: true,
-                        inRange: {
-                            color: ['#e0ffff', '#006edd']
-                        }
-                    },
-                    series: [{
-                        type: 'map',
-                        map: 'china', // 使用刚刚注册的中国地图
-                        label: {
-                            show: true
-                        },
-                        data: Object.keys(provinceMemberCount).map(province => ({
-                            name: province,
-                            value: provinceMemberCount[province]
-                        }))
-                    }]
-                };
-
-                // 绘制地图
-                mapChart.setOption(option);
-
-                // 点击事件，显示成员信息
-                mapChart.on('click', function (params) {
-                    var province = params.name;
-                    var membersInProvince = memberData.filter(member => member.province === province);
-
-                    if (membersInProvince.length > 0) {
-                        // 显示成员信息
-                        document.getElementById('province').innerText = province;
-                        var memberList = document.getElementById('memberList');
-                        memberList.innerHTML = '';
-
-                        membersInProvince.forEach(member => {
-                            var listItem = document.createElement('li');
-                            listItem.innerHTML = `<strong>${member.name}</strong> - ${member.status}, Email: ${member.email}`;
-                            memberList.appendChild(listItem);
-                        });
-
-                        document.getElementById('info').style.display = 'block';
-                    } else {
-                        document.getElementById('info').style.display = 'none';
+                },
+                visualMap: {
+                    min: 0,
+                    max: 5, // 调整为实际成员数量的最大值
+                    left: 'left',
+                    top: 'bottom',
+                    text: ['多', '少'],
+                    calculable: true,
+                    inRange: {
+                        color: ['#e0ffff', '#006edd']
                     }
-                });
-            })
-            .catch(error => console.error('Error loading data:', error));
+                },
+                series: [{
+                    type: 'map',
+                    map: 'china',
+                    label: {
+                        show: true
+                    },
+                    data: Object.keys(provinceMemberCount).map(province => ({
+                        name: province,
+                        value: provinceMemberCount[province]
+                    }))
+                }]
+            };
+
+            console.log('Map option:', option);
+            mapChart.setOption(option);
+
+            mapChart.on('click', function (params) {
+                var province = params.name;
+                var membersInProvince = memberData.filter(member => member.province === province);
+
+                if (membersInProvince.length > 0) {
+                    document.getElementById('province').innerText = province;
+                    var memberList = document.getElementById('memberList');
+                    memberList.innerHTML = '';
+
+                    membersInProvince.forEach(member => {
+                        var listItem = document.createElement('li');
+                        listItem.innerHTML = `<strong>${member.name}</strong> - ${member.status}, Email: ${member.email}`;
+                        memberList.appendChild(listItem);
+                    });
+
+                    document.getElementById('info').style.display = 'block';
+                } else {
+                    document.getElementById('info').style.display = 'none';
+                }
+            });
+        }).catch(error => {
+            console.error('Error loading or processing data:', error);
+            alert('加载地图时发生错误。请查看控制台以获取更多详细信息。');
+        });
     </script>
 </body>
 </html>
