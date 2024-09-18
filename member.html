@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Members Heatmap</title>
+    <title>Members and Sample Points Map</title>
     <style>
         #map {
             width: 70vw;
@@ -22,45 +22,56 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
 </head>
 <body>
-    <h1>成员地图</h1>
+    <h1>成员与样点地图</h1>
     <div id="map"></div>
     <div id="info">
-        <h3>省份：<span id="province"></span></h3>
-        <ul id="memberList"></ul>
+        <h3>信息：</h3>
+        <p id="content"></p>
     </div>
 
     <script>
         var mapChart = echarts.init(document.getElementById('map'));
         var memberData = [];
         var provinceMemberCount = {};
+        var sampleData = [];
 
+        // 加载成员数据和样点数据
         Promise.all([
-            fetch('map.json').then(response => response.json()),
-            fetch('member.json').then(response => response.json())
-        ]).then(([geoJson, data]) => {
+            fetch('map.json').then(response => response.json()),  // 地图数据
+            fetch('member.json').then(response => response.json()),  // 成员数据
+            fetch('test.json').then(response => response.json())  // 样点数据
+        ]).then(([geoJson, members, samples]) => {
             console.log('Loaded GeoJSON data:', geoJson);
             echarts.registerMap('china', geoJson);
             console.log('China map registered successfully');
 
-            memberData = data;
+            memberData = members;
+            sampleData = samples;
             console.log('Loaded member data:', memberData);
+            console.log('Loaded sample data:', sampleData);
 
-            data.forEach(member => {
+            // 统计每个省份的成员数量
+            memberData.forEach(member => {
                 if (provinceMemberCount[member.province]) {
                     provinceMemberCount[member.province]++;
                 } else {
                     provinceMemberCount[member.province] = 1;
                 }
             });
-            console.log('Province member count:', provinceMemberCount);
 
             var option = {
                 tooltip: {
                     trigger: 'item',
                     formatter: function (params) {
-                        var province = params.name;
-                        var count = provinceMemberCount[province] || 0;
-                        return province + ': ' + count + ' 名成员';
+                        // 判断是否点击省份还是样点
+                        if (params.seriesType === 'scatter') {
+                            var sample = params.data;
+                            return `名称: ${sample.name}<br>类型: ${sample.type}<br>描述: ${sample.description}`;
+                        } else {
+                            var province = params.name;
+                            var count = provinceMemberCount[province] || 0;
+                            return province + ': ' + count + ' 名成员';
+                        }
                     }
                 },
                 visualMap: {
@@ -77,58 +88,74 @@
                 geo: {
                     map: 'china',
                     roam: true,  // 允许放大缩小以及拖动
-                    zoom: 1.2,  // 初始缩放比例
-                    scaleLimit: { min: 1, max: 10 },  // 设定最小和最大的缩放比例
                     label: {
                         show: true
                     },
-                    emphasis: {
-                        label: {
-                            show: true
-                        }
+                    scaleLimit: {
+                        min: 1,
+                        max: 10
                     }
                 },
-                series: [{
-                    type: 'map',
-                    map: 'china',
-                    geoIndex: 0,  // 和上面的 geo 绑定
-                    label: {
-                        show: true
+                series: [
+                    {
+                        name: '成员分布',
+                        type: 'map',
+                        map: 'china',
+                        geoIndex: 0,
+                        label: {
+                            show: true
+                        },
+                        roam: true,  // 允许地图内容跟随放大缩小
+                        data: Object.keys(provinceMemberCount).map(province => ({
+                            name: province,
+                            value: provinceMemberCount[province]
+                        }))
                     },
-                    roam: true,  // 允许地图内容跟随放大缩小
-                    data: Object.keys(provinceMemberCount).map(province => ({
-                        name: province,
-                        value: provinceMemberCount[province]
-                    }))
-                }]
+                    {
+                        name: '样点',
+                        type: 'scatter',
+                        coordinateSystem: 'geo',
+                        symbolSize: 10,
+                        data: sampleData.map(sample => ({
+                            name: sample.name,
+                            value: [sample.longitude, sample.latitude],  // 经纬度
+                            description: sample.description,
+                            type: sample.type
+                        })),
+                        encode: {
+                            tooltip: [0, 1]
+                        }
+                    }
+                ]
             };
 
             console.log('Map option:', option);
             mapChart.setOption(option);
 
+            // 点击事件处理
             mapChart.on('click', function (params) {
-                var province = params.name;
-                var membersInProvince = memberData.filter(member => member.province === province);
-
-                if (membersInProvince.length > 0) {
-                    document.getElementById('province').innerText = province;
-                    var memberList = document.getElementById('memberList');
-                    memberList.innerHTML = '';
-
-                    membersInProvince.forEach(member => {
-                        var listItem = document.createElement('li');
-                        listItem.innerHTML = `<strong>${member.name}</strong> - ${member.status}, Email: ${member.email}`;
-                        memberList.appendChild(listItem);
-                    });
-
+                if (params.seriesType === 'scatter') {
+                    // 点击样点时，显示样点信息
+                    var sample = params.data;
+                    document.getElementById('content').innerHTML = `样点名称: ${sample.name}<br>类型: ${sample.type}<br>描述: ${sample.description}`;
                     document.getElementById('info').style.display = 'block';
-                } else {
-                    document.getElementById('info').style.display = 'none';
+                } else if (params.seriesType === 'map') {
+                    // 点击省份时，显示该省份的成员信息
+                    var province = params.name;
+                    var membersInProvince = memberData.filter(member => member.province === province);
+
+                    if (membersInProvince.length > 0) {
+                        var memberInfo = membersInProvince.map(member => `<strong>${member.name}</strong> - ${member.status}, Email: ${member.email}`).join('<br>');
+                        document.getElementById('content').innerHTML = `省份: ${province}<br>成员信息:<br>${memberInfo}`;
+                    } else {
+                        document.getElementById('content').innerHTML = `省份: ${province}<br>无成员信息`;
+                    }
+                    document.getElementById('info').style.display = 'block';
                 }
             });
         }).catch(error => {
             console.error('Error loading or processing data:', error);
-            alert('加载地图时发生错误。请查看控制台以获取更多详细信息。');
+            alert('加载数据时发生错误。请查看控制台以获取更多详细信息。');
         });
     </script>
 </body>
