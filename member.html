@@ -39,7 +39,7 @@
         Promise.all([
             fetch('map.json').then(response => response.json()),  // 地图数据
             fetch('member.json').then(response => response.json()),  // 成员数据
-            fetch('test.json').then(response => response.json())  // 样点数据
+            fetch('samples.json').then(response => response.json())  // 样点数据
         ]).then(([geoJson, members, samples]) => {
             console.log('Loaded GeoJSON data:', geoJson);
             echarts.registerMap('china', geoJson);
@@ -58,6 +58,13 @@
                     provinceMemberCount[member.province] = 1;
                 }
             });
+
+            // 手动为不同类型的样点指定颜色
+            var colorMapping = {
+                '类型A': '#FF0000', // 红色
+                '类型B': '#00FF00', // 绿色
+                '类型C': '#0000FF'  // 蓝色
+            };
 
             var option = {
                 tooltip: {
@@ -116,6 +123,12 @@
                         type: 'scatter',
                         coordinateSystem: 'geo',
                         symbolSize: 10,
+                        itemStyle: {
+                            color: function (params) {
+                                // 根据类别映射颜色
+                                return colorMapping[params.data.type];
+                            }
+                        },
                         data: sampleData.map(sample => ({
                             name: sample.name,
                             value: [sample.longitude, sample.latitude],  // 经纬度
