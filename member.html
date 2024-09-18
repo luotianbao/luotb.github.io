@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Heatmap</title>
+    <style>
+        #map {
+            width: 100%;
+            height: 600px;
+        }
+        #info {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: none;
+        }
+        #info h3 {
+            margin: 0 0 10px 0;
+        }
+    </style>
+    <!-- 引入ECharts库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+</head>
+<body>
+    <h1>中国地图热图</h1>
+    <div id="map"></div>
+    <div id="info">
+        <h3>省份：<span id="province"></span></h3>
+        <ul id="memberList"></ul>
+    </div>
+
+    <script>
+        // 初始化echarts实例
+        var mapChart = echarts.init(document.getElementById('map'));
+
+        // 存储从JSON文件读取的成员数据
+        var memberData = [];
+        var provinceMemberCount = {};
+
+        // 从JSON文件中加载数据
+        fetch('members.json')
+            .then(response => response.json())
+            .then(data => {
+                memberData = data;
+
+                // 统计每个省份的成员数量
+                data.forEach(member => {
+                    if (provinceMemberCount[member.province]) {
+                        provinceMemberCount[member.province]++;
+                    } else {
+                        provinceMemberCount[member.province] = 1;
+                    }
+                });
+
+                // 生成地图配置
+                var option = {
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: function (params) {
+                            var province = params.name;
+                            var count = provinceMemberCount[province] || 0;
+                            return province + ': ' + count + ' 名成员';
+                        }
+                    },
+                    visualMap: {
+                        min: 0,
+                        max: 10,
+                        left: 'left',
+                        top: 'bottom',
+                        text: ['多', '少'],
+                        calculable: true,
+                        inRange: {
+                            color: ['#e0ffff', '#006edd']
+                        }
+                    },
+                    series: [{
+                        type: 'map',
+                        map: 'china',
+                        label: {
+                            show: true
+                        },
+                        data: Object.keys(provinceMemberCount).map(province => ({
+                            name: province,
+                            value: provinceMemberCount[province]
+                        }))
+                    }]
+                };
+
+                // 绘制地图
+                mapChart.setOption(option);
+
+                // 点击事件，显示成员信息
+                mapChart.on('click', function (params) {
+                    var province = params.name;
+                    var membersInProvince = memberData.filter(member => member.province === province);
+
+                    if (membersInProvince.length > 0) {
+                        // 显示成员信息
+                        document.getElementById('province').innerText = province;
+                        var memberList = document.getElementById('memberList');
+                        memberList.innerHTML = '';
+
+                        membersInProvince.forEach(member => {
+                            var listItem = document.createElement('li');
+                            listItem.innerHTML = `<strong>${member.name}</strong> - ${member.status}, Email: ${member.email}`;
+                            memberList.appendChild(listItem);
+                        });
+
+                        document.getElementById('info').style.display = 'block';
+                    } else {
+                        document.getElementById('info').style.display = 'none';
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading members:', error));
+    </script>
+</body>
+</html>
