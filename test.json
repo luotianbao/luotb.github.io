@@ -1,1 +1,23 @@
-
+[
+    {
+        "name": "sample1",
+        "longitude": 115,
+        "latitude": 40.77,
+        "description": "Information1",
+        "type": "A"
+    },
+    {
+        "name": "sample2",
+        "longitude": 121.473701,
+        "latitude": 31.230416,
+        "description": "Information2",
+        "type": "B"
+    },
+    {
+        "name": "sample3",
+        "longitude": 114.057868,
+        "latitude": 22.543099,
+        "description": "Information3",
+        "type": "A"
+    }
+]
