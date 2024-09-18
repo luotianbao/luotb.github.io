@@ -6,8 +6,8 @@
     <title>Members and Sample Points Map</title>
     <style>
         #map {
-            width: 100vw;
-            height: 100vh;
+            width: 70vw;
+            height: 70vh;
         }
 
         /* 模态窗口样式 */
@@ -28,10 +28,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: white;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 30px;
+            border-radius: 10px;
             width: 600px;
-            text-align: center;
+            height: 400px;
+            text-align: left;
+            font-size: 16px;
         }
 
         .close {
@@ -66,20 +68,16 @@
 
     <script>
         var mapChart = echarts.init(document.getElementById('map'));
-        var memberData = [];
         var provinceMemberCount = {};
-        var sampleData = [];
 
-        // 加载成员数据和样点数据
+        // 加载地图数据、成员数据和样点数据
         Promise.all([
             fetch('map.json').then(response => response.json()),  // 地图数据
             fetch('member.json').then(response => response.json()),  // 成员数据
             fetch('test.json').then(response => response.json())  // 样点数据
-        ]).then(([geoJson, members, samples]) => {
+        ])
+        .then(([geoJson, memberData, sampleData]) => {
             echarts.registerMap('china', geoJson);
-
-            memberData = members;
-            sampleData = samples;
 
             // 统计每个省份的成员数量
             memberData.forEach(member => {
@@ -104,16 +102,16 @@
                         if (params.seriesType === 'scatter') {
                             var sample = params.data;
                             return `名称: ${sample.name}<br>类型: ${sample.type}<br>描述: ${sample.description}`;
-                        } else {
+                        } else if (params.seriesType === 'map') {
                             var province = params.name;
                             var count = provinceMemberCount[province] || 0;
-                            return province + ': ' + count + ' 名成员';
+                            return `${province}: ${count} 名成员`;
                         }
                     }
                 },
                 visualMap: {
                     min: 0,
-                    max: 5, // 调整为实际成员数量的最大值
+                    max: 5, // 根据实际情况调整最大值
                     left: 'left',
                     top: 'bottom',
                     text: ['多', '少'],
@@ -155,7 +153,8 @@
                         symbolSize: 10,
                         itemStyle: {
                             color: function (params) {
-                                return colorMapping[params.data.type];
+                                // 根据类型映射颜色
+                                return colorMapping[params.data.type] || '#000000'; // 默认颜色
                             }
                         },
                         data: sampleData.map(sample => ({
@@ -210,7 +209,8 @@
                 }
                 modal.style.display = 'block'; // 显示模态窗口
             });
-        }).catch(error => {
+        })
+        .catch(error => {
             console.error('Error loading or processing data:', error);
             alert('加载数据时发生错误。请查看控制台以获取更多详细信息。');
         });
