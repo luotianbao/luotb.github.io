@@ -156,7 +156,7 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <!-- iframe 加载 publications.html -->
-            <iframe src="publications.html" title="关于我"></iframe>
+            <iframe src="publications.html" title="论文"></iframe>
         </div>
     </div>
 
@@ -181,7 +181,7 @@
         }
         // 当用户点击 "论文" 按钮时，打开关于我的模态窗口
         publicationsBtn.onclick = function() {
-            publictionsModal.style.display = "flex";
+            publicationsModal.style.display = "flex";
         }
 
         // 当用户点击关闭按钮时，关闭模态窗口
@@ -198,7 +198,10 @@
                 contactModal.style.display = "none";
             } else if (event.target == aboutModal) {
                 aboutModal.style.display = "none";
+            } else if (event.target == publicationsModal) {
+                publicationsModal.style.display = "none";
             }
+            
         }
     </script>
     
