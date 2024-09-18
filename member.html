@@ -77,16 +77,25 @@
                 geo: {
                     map: 'china',
                     roam: true,  // 允许放大缩小以及拖动
+                    zoom: 1.2,  // 初始缩放比例
+                    scaleLimit: { min: 1, max: 10 },  // 设定最小和最大的缩放比例
                     label: {
                         show: true
+                    },
+                    emphasis: {
+                        label: {
+                            show: true
+                        }
                     }
                 },
                 series: [{
                     type: 'map',
                     map: 'china',
+                    geoIndex: 0,  // 和上面的 geo 绑定
                     label: {
                         show: true
                     },
+                    roam: true,  // 允许地图内容跟随放大缩小
                     data: Object.keys(provinceMemberCount).map(province => ({
                         name: province,
                         value: provinceMemberCount[province]
