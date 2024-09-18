@@ -1,23 +1,34 @@
 [
     {
-        "name": "sample1",
-        "longitude": 115,
-        "latitude": 40.77,
-        "description": "Information1",
-        "type": "类型A"
+        "name": "样点1",
+        "longitude": 116.4074,
+        "latitude": 39.9042,
+        "description": "这是样点1的描述",
+        "type": "类型A",
+        "connections": ["样点2", "样点3"]
     },
     {
-        "name": "sample2",
-        "longitude": 121.473701,
-        "latitude": 31.230416,
-        "description": "Information2",
-        "type": "类型B"
+        "name": "样点2",
+        "longitude": 121.4737,
+        "latitude": 31.2304,
+        "description": "这是样点2的描述",
+        "type": "类型B",
+        "connections": ["样点1", "样点4"]
     },
     {
-        "name": "sample3",
-        "longitude": 114.057868,
-        "latitude": 22.543099,
-        "description": "Information3",
-        "type": "类型A"
+        "name": "样点3",
+        "longitude": 114.3055,
+        "latitude": 30.5928,
+        "description": "这是样点3的描述",
+        "type": "类型C",
+        "connections": ["样点1"]
+    },
+    {
+        "name": "样点4",
+        "longitude": 113.2644,
+        "latitude": 23.1291,
+        "description": "这是样点4的描述",
+        "type": "类型A",
+        "connections": ["样点2"]
     }
 ]
