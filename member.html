@@ -207,10 +207,6 @@
                     var networkGraph = echarts.init(document.getElementById('networkGraph'));
 
                     var graphOption = {
-                        title: {
-                            text: `捕食网络图 - ${sample.name}`,
-                            left: 'center'
-                        },
                         tooltip: {},
                         series: [{
                             type: 'graph',
@@ -233,7 +229,7 @@
                                 position: 'right'
                             },
                             force: {
-                                repulsion: 500
+                                repulsion: 200
                             },
                             lineStyle: {
                                 color: 'source',
