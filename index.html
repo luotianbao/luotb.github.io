@@ -109,7 +109,7 @@
 
     <!-- 顶部菜单栏 -->
     <nav>
-        <a href="about.html">about</a>
+        <a href="#" id="about-btn">about</a>
         <a href="members.html">members</a>
         <a href="publications.html">publications</a>
         <a href="blogs.html">blogs</a>
@@ -142,27 +142,48 @@
         </div>
     </div>
 
+        <!-- 关于我的模态窗口 -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <!-- iframe 加载 about.html -->
+            <iframe src="about.html" title="关于我"></iframe>
+        </div>
+    </div>
+
     <script>
         // 获取模态窗口和相关元素
-        var modal = document.getElementById("contactModal");
-        var btn = document.getElementById("contact-btn");
-        var span = document.getElementsByClassName("close")[0];
+        var contactModal = document.getElementById("contactModal");
+        var aboutModal = document.getElementById("aboutModal");
+        var contactBtn = document.getElementById("contact-btn");
+        var aboutBtn = document.getElementById("about-btn");
+        var closeButtons = document.getElementsByClassName("close");
 
         // 当用户点击按钮时，打开模态窗口
-        btn.onclick = function() {
-            modal.style.display = "flex";
+        contactBtn.onclick = function() {
+            contactModal.style.display = "flex";
         }
 
+        // 当用户点击 "关于我" 按钮时，打开关于我的模态窗口
+        aboutBtn.onclick = function() {
+            aboutModal.style.display = "flex";
+        }
+
+
         // 当用户点击关闭按钮时，关闭模态窗口
-        span.onclick = function() {
-            modal.style.display = "none";
+        for (var i = 0; i < closeButtons.length; i++) {
+            closeButtons[i].onclick = function() {
+                contactModal.style.display = "none";
+                aboutModal.style.display = "none";
+            }
         }
 
         // 当用户点击模态窗口外的区域时，关闭模态窗口并返回主页
         window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-                window.location.href = "index.html"; // 返回主页
+            if (event.target == contactModal) {
+                contactModal.style.display = "none";
+            } else if (event.target == aboutModal) {
+                aboutModal.style.display = "none";
             }
         }
     </script>
