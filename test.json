@@ -5,7 +5,20 @@
         "latitude": 39.9042,
         "description": "这是样点1的描述",
         "type": "类型A",
-        "connections": ["样点2", "样点3"]
+        "predation_network": {
+            "species": [
+                { "name": "狮子", "type": "捕食者" },
+                { "name": "羚羊", "type": "被捕食者" },
+                { "name": "兔子", "type": "被捕食者" },
+                { "name": "草", "type": "生产者" }
+            ],
+            "relations": [
+                { "source": "狮子", "target": "羚羊" },
+                { "source": "狮子", "target": "兔子" },
+                { "source": "羚羊", "target": "草" },
+                { "source": "兔子", "target": "草" }
+            ]
+        }
     },
     {
         "name": "样点2",
@@ -13,22 +26,20 @@
         "latitude": 31.2304,
         "description": "这是样点2的描述",
         "type": "类型B",
-        "connections": ["样点1", "样点4"]
-    },
-    {
-        "name": "样点3",
-        "longitude": 114.3055,
-        "latitude": 30.5928,
-        "description": "这是样点3的描述",
-        "type": "类型C",
-        "connections": ["样点1"]
-    },
-    {
-        "name": "样点4",
-        "longitude": 113.2644,
-        "latitude": 23.1291,
-        "description": "这是样点4的描述",
-        "type": "类型A",
-        "connections": ["样点2"]
+        "predation_network": {
+            "species": [
+                { "name": "鹰", "type": "捕食者" },
+                { "name": "蛇", "type": "被捕食者" },
+                { "name": "老鼠", "type": "被捕食者" },
+                { "name": "草", "type": "生产者" }
+            ],
+            "relations": [
+                { "source": "鹰", "target": "蛇" },
+                { "source": "鹰", "target": "老鼠" },
+                { "source": "蛇", "target": "老鼠" },
+                { "source": "老鼠", "target": "草" }
+            ]
+        }
     }
 ]
+
