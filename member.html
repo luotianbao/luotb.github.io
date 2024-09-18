@@ -233,8 +233,10 @@
                                 position: 'right'
                             },
                             force: {
-                                repulsion: 200
-                            },
+                                repulsion: 200,  // 控制节点间的斥力
+                                edgeLength: [100, 300]  // 修改这个值来调整边的长度范围
+                            }
+
                             lineStyle: {
                                 color: 'source',
                                 curveness: 0.3
