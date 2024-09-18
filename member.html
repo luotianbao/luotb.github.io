@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Members and Sample Points Map</title>
+    <title>捕食网络图</title>
     <style>
         #map {
             width: 100vw;
@@ -54,23 +54,21 @@
         /* 网络图的容器样式 */
         #networkGraph {
             width: 100%;
-            height: 300px;
+            height: 400px;
             margin-top: 20px;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
 </head>
 <body>
-    <h1>成员与样点地图</h1>
+    <h1>捕食网络图</h1>
     <div id="map"></div>
 
     <!-- 模态窗口 -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h3>信息详情</h3>
-            <p id="modalContent"></p>
-            <!-- 网络图的容器 -->
+            <h3>捕食网络图</h3>
             <div id="networkGraph"></div>
         </div>
     </div>
@@ -170,7 +168,8 @@
                             name: sample.name,
                             value: [sample.longitude, sample.latitude],  // 经纬度
                             description: sample.description,
-                            type: sample.type
+                            type: sample.type,
+                            predation_network: sample.predation_network
                         })),
                         encode: {
                             tooltip: [0, 1]
@@ -183,7 +182,6 @@
 
             // 模态窗口逻辑
             var modal = document.getElementById('myModal');
-            var modalContent = document.getElementById('modalContent');
             var span = document.getElementsByClassName('close')[0];
 
             // 点击关闭按钮，关闭模态窗口
@@ -201,61 +199,51 @@
             // 点击事件处理
             mapChart.on('click', function (params) {
                 if (params.seriesType === 'scatter') {
-                    // 点击样点时，显示样点信息
+                    // 点击样点时，显示样点的捕食网络
                     var sample = params.data;
-                    modalContent.innerHTML = `样点名称: ${sample.name}<br>类型: ${sample.type}<br>描述: ${sample.description}`;
+                    modal.style.display = 'block'; // 显示模态窗口
 
-                    // 生成网络图
+                    // 生成捕食网络图
                     var networkGraph = echarts.init(document.getElementById('networkGraph'));
-
-                    // 假设我们有样点之间的连接关系数据
-                    var links = sampleData.filter(s => s.name !== sample.name).map(s => ({
-                        source: sample.name,
-                        target: s.name,
-                        value: Math.random() // 假设的权重值
-                    }));
 
                     var graphOption = {
                         title: {
-                            text: '样点关联网络图',
+                            text: `捕食网络图 - ${sample.name}`,
                             left: 'center'
                         },
                         tooltip: {},
                         series: [{
                             type: 'graph',
                             layout: 'force',
-                            data: sampleData.map(s => ({
+                            data: sample.predation_network.species.map(s => ({
                                 name: s.name,
-                                symbolSize: 10,
+                                symbolSize: s.type === '捕食者' ? 50 : (s.type === '被捕食者' ? 30 : 20),
+                                category: s.type,
                                 value: s.type
                             })),
-                            links: links,
+                            links: sample.predation_network.relations,
                             roam: true,
+                            categories: [
+                                { name: '捕食者' },
+                                { name: '被捕食者' },
+                                { name: '生产者' }
+                            ],
                             label: {
                                 show: true,
                                 position: 'right'
                             },
                             force: {
-                                repulsion: 100
+                                repulsion: 200
+                            },
+                            lineStyle: {
+                                color: 'source',
+                                curveness: 0.3
                             }
                         }]
                     };
 
                     networkGraph.setOption(graphOption);
-
-                } else if (params.seriesType === 'map') {
-                    // 点击省份时，显示该省份的成员信息
-                    var province = params.name;
-                    var membersInProvince = memberData.filter(member => member.province === province);
-
-                    if (membersInProvince.length > 0) {
-                        var memberInfo = membersInProvince.map(member => `<strong>${member.name}</strong> - ${member.status}, Email: ${member.email}`).join('<br>');
-                        modalContent.innerHTML = `省份: ${province}<br>成员信息:<br>${memberInfo}`;
-                    } else {
-                        modalContent.innerHTML = `省份: ${province}<br>无成员信息`;
-                    }
                 }
-                modal.style.display = 'block'; // 显示模态窗口
             });
         })
         .catch(error => {
