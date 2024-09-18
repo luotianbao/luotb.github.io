@@ -39,7 +39,7 @@
         Promise.all([
             fetch('map.json').then(response => response.json()),  // 地图数据
             fetch('member.json').then(response => response.json()),  // 成员数据
-            fetch('samples.json').then(response => response.json())  // 样点数据
+            fetch('test.json').then(response => response.json())  // 样点数据
         ]).then(([geoJson, members, samples]) => {
             console.log('Loaded GeoJSON data:', geoJson);
             echarts.registerMap('china', geoJson);
