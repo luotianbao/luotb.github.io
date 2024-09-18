@@ -38,8 +38,8 @@
         var memberData = [];
         var provinceMemberCount = {};
 
-        // 加载阿里云提供的中国省级GeoJSON文件
-        fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json')
+        // 加载本地的中国地图GeoJSON文件
+        fetch('map.json') // 本地文件路径
             .then(response => response.json())
             .then(geoJson => {
                 // 注册中国地图
