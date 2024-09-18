@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>捕食网络图</title>
     <style>
         #map {
             width: 100vw;
@@ -23,8 +24,8 @@
 
         .modal-content {
             position: absolute;
-            top: 100%;
-            left: 100%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
             background-color: white;
             padding: 30px;
@@ -206,6 +207,10 @@
                     var networkGraph = echarts.init(document.getElementById('networkGraph'));
 
                     var graphOption = {
+                        title: {
+                            text: `捕食网络图 - ${sample.name}`,
+                            left: 'center'
+                        },
                         tooltip: {},
                         series: [{
                             type: 'graph',
@@ -228,9 +233,8 @@
                                 position: 'right'
                             },
                             force: {
-                                repulsion: 200,  // 控制节点间的斥力
-                                edgeLength: [100, 300]  // 修改这个值来调整边的长度范围
-                            }
+                                repulsion: 200
+                            },
                             lineStyle: {
                                 color: 'source',
                                 curveness: 0.3
