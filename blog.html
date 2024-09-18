@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+        }
+        li a {
+            color: #333;
+            text-decoration: none;
+        }
+        li a:hover {
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>博客列表</h1>
+    <ul id="blogList">
+        <!-- 动态生成的博客文章列表将显示在这里 -->
+    </ul>
+
+    <script>
+        // 动态加载 blogs.json 文件并生成博客文章列表
+        fetch('blogs/blogs.json')
+        .then(response => response.json())
+        .then(blogs => {
+            const blogList = document.getElementById('blogList');
+            blogs.forEach(blog => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = `blogs/${blog.file}`;
+                link.textContent = blog.title;
+                listItem.appendChild(link);
+                blogList.appendChild(listItem);
+            });
+        })
+        .catch(error => console.error('Error loading blogs:', error));
+    </script>
+
+</body>
+</html>
