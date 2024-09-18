@@ -30,8 +30,8 @@
             background-color: white;
             padding: 30px;
             border-radius: 10px;
-            width: 600px;
-            height: 400px;
+            width: 700px;
+            height: 500px;
             text-align: left;
             font-size: 16px;
         }
@@ -50,6 +50,13 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        /* 网络图的容器样式 */
+        #networkGraph {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
 </head>
@@ -63,6 +70,8 @@
             <span class="close">&times;</span>
             <h3>信息详情</h3>
             <p id="modalContent"></p>
+            <!-- 网络图的容器 -->
+            <div id="networkGraph"></div>
         </div>
     </div>
 
@@ -195,6 +204,45 @@
                     // 点击样点时，显示样点信息
                     var sample = params.data;
                     modalContent.innerHTML = `样点名称: ${sample.name}<br>类型: ${sample.type}<br>描述: ${sample.description}`;
+
+                    // 生成网络图
+                    var networkGraph = echarts.init(document.getElementById('networkGraph'));
+
+                    // 假设我们有样点之间的连接关系数据
+                    var links = sampleData.filter(s => s.name !== sample.name).map(s => ({
+                        source: sample.name,
+                        target: s.name,
+                        value: Math.random() // 假设的权重值
+                    }));
+
+                    var graphOption = {
+                        title: {
+                            text: '样点关联网络图',
+                            left: 'center'
+                        },
+                        tooltip: {},
+                        series: [{
+                            type: 'graph',
+                            layout: 'force',
+                            data: sampleData.map(s => ({
+                                name: s.name,
+                                symbolSize: 10,
+                                value: s.type
+                            })),
+                            links: links,
+                            roam: true,
+                            label: {
+                                show: true,
+                                position: 'right'
+                            },
+                            force: {
+                                repulsion: 100
+                            }
+                        }]
+                    };
+
+                    networkGraph.setOption(graphOption);
+
                 } else if (params.seriesType === 'map') {
                     // 点击省份时，显示该省份的成员信息
                     var province = params.name;
